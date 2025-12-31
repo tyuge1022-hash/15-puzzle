@@ -28,7 +28,7 @@
 
         .brand-font { font-family: 'Montserrat', sans-serif; }
 
-        /* オープニング画面 */
+        /* Opening Screen */
         #opening {
             position: fixed;
             inset: 0;
@@ -38,18 +38,27 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s ease;
+            transition: opacity 0.6s ease, visibility 0.6s;
+        }
+
+        #opening.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         .pix-container {
-            width: 280px;
-            height: 280px;
+            width: 240px;
+            height: 240px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.05);
             border: 4px solid var(--secondary);
             overflow: hidden;
             margin-bottom: 24px;
             box-shadow: 0 0 50px rgba(56, 189, 248, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .pix-container img {
@@ -58,7 +67,7 @@
             object-fit: cover;
         }
 
-        /* パズルコンテナ */
+        /* Puzzle Grid Container */
         .puzzle-container {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -66,9 +75,10 @@
             border-radius: 32px;
             padding: 24px;
             width: 92vw;
-            max-width: 420px;
+            max-width: 400px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             position: relative;
+            z-index: 10;
         }
 
         .tile {
@@ -78,15 +88,15 @@
             justify-content: center;
             background: var(--tile);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            font-size: 1.75rem;
+            border-radius: 12px;
+            font-size: 1.5rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
             user-select: none;
         }
 
-        .tile:active { transform: scale(0.9); }
+        .tile:active { transform: scale(0.92); }
 
         .tile.correct {
             background: linear-gradient(135deg, #4ade80 0%, #2dd4bf 100%);
@@ -106,46 +116,49 @@
             bottom: 20px;
             width: 100%;
             text-align: center;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.2);
             letter-spacing: 4px;
             text-transform: uppercase;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- オープニング画面 -->
+    <!-- Opening Screen -->
     <div id="opening">
         <div class="pix-container">
-            <!-- PIXのイメージ -->
-            <img src="http://googleusercontent.com/image_collection/image_retrieval/11102290430544420890" alt="PIX マスコット">
+            <img src="http://googleusercontent.com/image_collection/image_retrieval/11102290430544420890" alt="PIX マスコット" onerror="this.src='https://via.placeholder.com/240?text=PIX'">
         </div>
         <h1 class="brand-font text-4xl mb-2 text-white">NOTORE <span class="text-sky-400">♾️</span></h1>
-        <p class="text-slate-400 mb-8 font-bold">&lt;produced by NEX’♾️&gt;</p>
-        <button onclick="startGame()" class="bg-sky-500 hover:bg-sky-400 text-white font-black brand-font py-4 px-12 rounded-full shadow-lg shadow-sky-500/30 transition-all hover:scale-105 active:scale-95">
+        <p class="text-slate-400 mb-8 font-bold tracking-widest text-xs uppercase">&lt;produced by NEX’♾️&gt;</p>
+        <button id="startBtn" class="bg-sky-500 hover:bg-sky-400 text-white font-black brand-font py-4 px-12 rounded-full shadow-lg shadow-sky-500/30 transition-all hover:scale-105 active:scale-95">
             START TRAINING
         </button>
     </div>
 
-    <!-- メインゲームUI -->
+    <!-- Main Game UI -->
     <div class="puzzle-container flex flex-col gap-6">
-        <div class="flex justify-between items-center px-1">
-            <h2 class="brand-font text-xl text-white">LEVEL <span id="levelDisplay" class="text-sky-400">01</span></h2>
+        <div class="flex justify-between items-end px-1">
+            <div>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Training</p>
+                <h2 class="brand-font text-xl text-white">LEVEL <span id="levelDisplay" class="text-sky-400">01</span></h2>
+            </div>
             <div class="flex gap-4">
-                <div class="text-center">
+                <div class="text-right">
                     <p class="text-[9px] text-slate-500 font-bold uppercase">Moves</p>
-                    <p id="moveCount" class="brand-font text-lg">0</p>
+                    <p id="moveCount" class="brand-font text-lg leading-tight">0</p>
                 </div>
-                <div class="text-center">
+                <div class="text-right">
                     <p class="text-[9px] text-slate-500 font-bold uppercase">Time</p>
-                    <p id="timer" class="brand-font text-lg text-sky-400 font-mono">00:00</p>
+                    <p id="timer" class="brand-font text-lg text-sky-400 font-mono leading-tight">00:00</p>
                 </div>
             </div>
         </div>
 
-        <div id="grid" class="grid gap-3"></div>
+        <div id="grid" class="grid gap-2"></div>
 
         <div class="grid grid-cols-2 gap-3">
             <select id="difficulty" class="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-sky-500 transition-all cursor-pointer">
@@ -158,13 +171,13 @@
             </button>
         </div>
 
-        <!-- 成功モーダル -->
-        <div id="modal" class="fixed inset-0 bg-slate-950/90 hidden flex items-center justify-center p-4 z-50 rounded-3xl">
+        <!-- Success Modal -->
+        <div id="modal" class="fixed inset-0 bg-slate-950/95 hidden flex items-center justify-center p-4 z-50 rounded-3xl">
             <div class="text-center">
                 <div class="text-6xl mb-4">🏆</div>
                 <h2 class="brand-font text-3xl font-black text-white mb-2">CLEARED!</h2>
-                <p id="resultText" class="text-slate-400 mb-8"></p>
-                <button id="nextLevelBtn" class="w-full bg-sky-500 text-white font-black brand-font py-4 px-8 rounded-2xl shadow-lg shadow-sky-500/20">
+                <p id="resultText" class="text-slate-400 mb-8 font-medium"></p>
+                <button id="nextLevelBtn" class="w-full bg-sky-500 text-white font-black brand-font py-4 px-8 rounded-2xl shadow-lg shadow-sky-500/20 active:scale-95 transition-transform">
                     NEXT LEVEL ♾️
                 </button>
             </div>
@@ -182,6 +195,8 @@
         let isGameActive = false;
         let level = 1;
 
+        const opening = document.getElementById('opening');
+        const startBtn = document.getElementById('startBtn');
         const gridElement = document.getElementById('grid');
         const moveDisplay = document.getElementById('moveCount');
         const timerDisplay = document.getElementById('timer');
@@ -192,13 +207,11 @@
         const resultText = document.getElementById('resultText');
         const nextLevelBtn = document.getElementById('nextLevelBtn');
 
-        function startGame() {
-            document.getElementById('opening').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('opening').style.display = 'none';
-                initGame();
-            }, 800);
-        }
+        // Opening sequence
+        startBtn.onclick = () => {
+            opening.classList.add('hidden');
+            initGame();
+        };
 
         function initGame() {
             size = parseInt(difficultySelect.value);
@@ -212,31 +225,32 @@
         }
 
         function resetStats() {
+            clearInterval(timerInterval);
             moves = 0;
             timer = 0;
             moveDisplay.innerText = moves;
             timerDisplay.innerText = "00:00";
             levelDisplay.innerText = level.toString().padStart(2, '0');
-            clearInterval(timerInterval);
         }
 
         function createTiles() {
             tiles = Array.from({ length: size * size }, (_, i) => i + 1);
-            tiles[tiles.length - 1] = 0; // 0 は空きマス
+            tiles[tiles.length - 1] = 0; // Empty slot
         }
 
         function shuffleTiles() {
+            // Valid shuffle by simulating random moves
             let emptyIdx = tiles.indexOf(0);
             const shuffleMoves = size * size * 40;
             for (let i = 0; i < shuffleMoves; i++) {
                 const r = Math.floor(emptyIdx / size);
                 const c = emptyIdx % size;
-                const moves = [];
-                if (r > 0) moves.push(emptyIdx - size);
-                if (r < size - 1) moves.push(emptyIdx + size);
-                if (c > 0) moves.push(emptyIdx - 1);
-                if (c < size - 1) moves.push(emptyIdx + 1);
-                const randomNeighbor = moves[Math.floor(Math.random() * moves.length)];
+                const possibleIndices = [];
+                if (r > 0) possibleIndices.push(emptyIdx - size);
+                if (r < size - 1) possibleIndices.push(emptyIdx + size);
+                if (c > 0) possibleIndices.push(emptyIdx - 1);
+                if (c < size - 1) possibleIndices.push(emptyIdx + 1);
+                const randomNeighbor = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
                 [tiles[emptyIdx], tiles[randomNeighbor]] = [tiles[randomNeighbor], tiles[emptyIdx]];
                 emptyIdx = randomNeighbor;
             }
@@ -278,7 +292,7 @@
             if (isWin) {
                 isGameActive = false;
                 clearInterval(timerInterval);
-                resultText.innerText = `${moves} Moves | ${timerDisplay.innerText}`;
+                resultText.innerText = `${moves} 手 | ${timerDisplay.innerText}`;
                 modal.classList.remove('hidden');
             }
         }
@@ -300,7 +314,7 @@
             initGame();
         };
 
-        // キーボード操作対応
+        // Keyboard support
         window.onkeydown = (e) => {
             if (!isGameActive) return;
             const emptyIdx = tiles.indexOf(0);
