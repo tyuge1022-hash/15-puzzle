@@ -11,54 +11,59 @@
             --primary: #4ade80;
             --secondary: #38bdf8;
             --bg: #0f172a;
-            --tile: rgba(255, 255, 255, 0.08);
         }
         
         body {
-            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            background: #0f172a;
             color: #f8fafc;
             font-family: 'Outfit', sans-serif;
             overflow: hidden;
             height: 100vh;
+            margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
         }
 
         .brand-font { font-family: 'Montserrat', sans-serif; }
 
-        /* Opening Screen */
+        /* Opening Screen Styling */
         #opening {
             position: fixed;
-            inset: 0;
-            background: #0f172a;
-            z-index: 100;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            z-index: 1000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.6s ease, visibility 0.6s;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        #opening.hidden {
+        /* 隠す時のアニメーション */
+        #opening.fade-out {
             opacity: 0;
             visibility: hidden;
+            transform: scale(1.1);
             pointer-events: none;
         }
 
         .pix-container {
-            width: 240px;
-            height: 240px;
-            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            border-radius: 40px;
             background: rgba(255, 255, 255, 0.05);
-            border: 4px solid var(--secondary);
+            border: 2px solid rgba(56, 189, 248, 0.5);
             overflow: hidden;
-            margin-bottom: 24px;
-            box-shadow: 0 0 50px rgba(56, 189, 248, 0.3);
+            margin-bottom: 2rem;
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .pix-container img {
@@ -67,18 +72,31 @@
             object-fit: cover;
         }
 
-        /* Puzzle Grid Container */
+        .pix-fallback {
+            position: absolute;
+            font-size: 10px;
+            color: rgba(56, 189, 248, 0.5);
+            font-weight: bold;
+        }
+
+        /* Puzzle Styling */
         .puzzle-container {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 32px;
             padding: 24px;
-            width: 92vw;
+            width: 90vw;
             max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            position: relative;
-            z-index: 10;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .grid-board {
+            display: grid;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-radius: 20px;
         }
 
         .tile {
@@ -86,22 +104,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--tile);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.07);
             border-radius: 12px;
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 0.2s ease;
             user-select: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .tile:active { transform: scale(0.92); }
+        .tile:hover { background: rgba(255, 255, 255, 0.15); }
+        .tile:active { transform: scale(0.95); }
 
         .tile.correct {
-            background: linear-gradient(135deg, #4ade80 0%, #2dd4bf 100%);
+            background: linear-gradient(135deg, #4ade80, #2dd4bf);
             color: #064e3b;
-            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
             border: none;
         }
 
@@ -111,17 +130,29 @@
             cursor: default;
         }
 
-        .footer-brand {
+        /* Success Overlay */
+        #modal {
             position: absolute;
-            bottom: 20px;
-            width: 100%;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 32px;
             text-align: center;
+            padding: 20px;
+        }
+
+        .footer-tag {
+            position: fixed;
+            bottom: 20px;
             font-size: 10px;
-            font-weight: 700;
+            letter-spacing: 0.2em;
             color: rgba(255, 255, 255, 0.2);
-            letter-spacing: 4px;
+            font-weight: bold;
             text-transform: uppercase;
-            pointer-events: none;
         }
     </style>
 </head>
@@ -130,70 +161,70 @@
     <!-- Opening Screen -->
     <div id="opening">
         <div class="pix-container">
-            <img src="http://googleusercontent.com/image_collection/image_retrieval/11102290430544420890" alt="PIX マスコット" onerror="this.src='https://via.placeholder.com/240?text=PIX'">
+            <span class="pix-fallback">LOADING ASSETS...</span>
+            <img src="http://googleusercontent.com/image_collection/image_retrieval/11102290430544420890" alt="PIX" onerror="this.style.display='none'">
         </div>
-        <h1 class="brand-font text-4xl mb-2 text-white">NOTORE <span class="text-sky-400">♾️</span></h1>
-        <p class="text-slate-400 mb-8 font-bold tracking-widest text-xs uppercase">&lt;produced by NEX’♾️&gt;</p>
-        <button id="startBtn" class="bg-sky-500 hover:bg-sky-400 text-white font-black brand-font py-4 px-12 rounded-full shadow-lg shadow-sky-500/30 transition-all hover:scale-105 active:scale-95">
-            START TRAINING
+        <h1 class="brand-font text-5xl mb-2 tracking-tighter text-white">NOTORE <span class="text-sky-400 italic">♾️</span></h1>
+        <p class="text-slate-500 mb-12 font-bold tracking-[0.3em] text-[10px] uppercase">&lt;produced by NEX’♾️&gt;</p>
+        
+        <button id="startBtn" class="group relative px-10 py-5 bg-sky-500 rounded-full overflow-hidden shadow-2xl shadow-sky-500/20 transition-all hover:scale-105 active:scale-95">
+            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            <span class="relative brand-font font-black text-white text-lg tracking-widest">START TRAINING</span>
         </button>
     </div>
 
-    <!-- Main Game UI -->
-    <div class="puzzle-container flex flex-col gap-6">
-        <div class="flex justify-between items-end px-1">
-            <div>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Training</p>
-                <h2 class="brand-font text-xl text-white">LEVEL <span id="levelDisplay" class="text-sky-400">01</span></h2>
-            </div>
-            <div class="flex gap-4">
-                <div class="text-right">
-                    <p class="text-[9px] text-slate-500 font-bold uppercase">Moves</p>
-                    <p id="moveCount" class="brand-font text-lg leading-tight">0</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[9px] text-slate-500 font-bold uppercase">Time</p>
-                    <p id="timer" class="brand-font text-lg text-sky-400 font-mono leading-tight">00:00</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="grid" class="grid gap-2"></div>
-
-        <div class="grid grid-cols-2 gap-3">
-            <select id="difficulty" class="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-sky-500 transition-all cursor-pointer">
-                <option value="3" class="bg-slate-900">3 x 3 (Beginner)</option>
-                <option value="4" selected class="bg-slate-900">4 x 4 (Standard)</option>
-                <option value="5" class="bg-slate-900">5 x 5 (Pro)</option>
-            </select>
-            <button id="resetBtn" class="bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl px-4 py-3 text-white font-bold transition-all active:scale-90 flex items-center justify-center gap-2">
-                RETRY
+    <!-- Main Game -->
+    <div class="puzzle-container flex flex-col gap-6 relative">
+        <div id="modal">
+            <div class="text-6xl mb-4">✨</div>
+            <h2 class="brand-font text-3xl font-black text-white mb-2">COMPLETE</h2>
+            <p id="resultText" class="text-slate-400 mb-8"></p>
+            <button id="nextLevelBtn" class="w-full bg-sky-500 text-white font-black brand-font py-4 rounded-2xl shadow-lg active:scale-95 transition-transform">
+                NEXT LEVEL
             </button>
         </div>
 
-        <!-- Success Modal -->
-        <div id="modal" class="fixed inset-0 bg-slate-950/95 hidden flex items-center justify-center p-4 z-50 rounded-3xl">
-            <div class="text-center">
-                <div class="text-6xl mb-4">🏆</div>
-                <h2 class="brand-font text-3xl font-black text-white mb-2">CLEARED!</h2>
-                <p id="resultText" class="text-slate-400 mb-8 font-medium"></p>
-                <button id="nextLevelBtn" class="w-full bg-sky-500 text-white font-black brand-font py-4 px-8 rounded-2xl shadow-lg shadow-sky-500/20 active:scale-95 transition-transform">
-                    NEXT LEVEL ♾️
-                </button>
+        <div class="flex justify-between items-center px-1">
+            <div>
+                <span class="text-[9px] text-slate-500 font-black uppercase tracking-widest block">Session</span>
+                <h2 class="brand-font text-xl text-white">LEVEL <span id="levelDisplay" class="text-sky-400">01</span></h2>
             </div>
+            <div class="flex gap-4 text-right">
+                <div>
+                    <span class="text-[9px] text-slate-500 font-black uppercase block">Moves</span>
+                    <span id="moveCount" class="brand-font text-lg">0</span>
+                </div>
+                <div>
+                    <span class="text-[9px] text-slate-500 font-black uppercase block">Time</span>
+                    <span id="timer" class="brand-font text-lg text-sky-400 font-mono">00:00</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="grid" class="grid-board"></div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <select id="difficulty" class="bg-slate-800 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-sky-500 outline-none">
+                <option value="3">3 x 3</option>
+                <option value="4" selected>4 x 4</option>
+                <option value="5">5 x 5</option>
+            </select>
+            <button id="resetBtn" class="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white font-bold hover:bg-white/10 transition-colors">
+                RETRY
+            </button>
         </div>
     </div>
 
-    <div class="footer-brand">&lt;produced by NEX’♾️&gt;</div>
+    <div class="footer-tag">&lt;produced by NEX’♾️&gt;</div>
 
     <script>
         let size = 4;
         let tiles = [];
         let moves = 0;
-        let timer = 0;
-        let timerInterval;
-        let isGameActive = false;
-        let level = 1;
+        let time = 0;
+        let timerInterval = null;
+        let isStarted = false;
+        let currentLevel = 1;
 
         const opening = document.getElementById('opening');
         const startBtn = document.getElementById('startBtn');
@@ -201,132 +232,133 @@
         const moveDisplay = document.getElementById('moveCount');
         const timerDisplay = document.getElementById('timer');
         const levelDisplay = document.getElementById('levelDisplay');
-        const difficultySelect = document.getElementById('difficulty');
+        const diffSelect = document.getElementById('difficulty');
         const resetBtn = document.getElementById('resetBtn');
         const modal = document.getElementById('modal');
-        const resultText = document.getElementById('resultText');
-        const nextLevelBtn = document.getElementById('nextLevelBtn');
+        const nextBtn = document.getElementById('nextLevelBtn');
 
-        // Opening sequence
-        startBtn.onclick = () => {
-            opening.classList.add('hidden');
-            initGame();
-        };
+        // Opening Controller
+        startBtn.addEventListener('click', () => {
+            opening.classList.add('fade-out');
+            setTimeout(() => {
+                initGame();
+            }, 300);
+        });
 
         function initGame() {
-            size = parseInt(difficultySelect.value);
+            size = parseInt(diffSelect.value);
             gridElement.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-            resetStats();
-            createTiles();
+            resetGame();
+            generateTiles();
             shuffleTiles();
-            renderGrid();
+            render();
             startTimer();
-            isGameActive = true;
+            isStarted = true;
         }
 
-        function resetStats() {
+        function resetGame() {
             clearInterval(timerInterval);
             moves = 0;
-            timer = 0;
+            time = 0;
             moveDisplay.innerText = moves;
             timerDisplay.innerText = "00:00";
-            levelDisplay.innerText = level.toString().padStart(2, '0');
+            levelDisplay.innerText = currentLevel.toString().padStart(2, '0');
+            modal.style.display = 'none';
         }
 
-        function createTiles() {
+        function generateTiles() {
             tiles = Array.from({ length: size * size }, (_, i) => i + 1);
-            tiles[tiles.length - 1] = 0; // Empty slot
+            tiles[tiles.length - 1] = 0;
         }
 
         function shuffleTiles() {
-            // Valid shuffle by simulating random moves
-            let emptyIdx = tiles.indexOf(0);
-            const shuffleMoves = size * size * 40;
-            for (let i = 0; i < shuffleMoves; i++) {
+            let emptyIdx = tiles.length - 1;
+            const iterations = size * size * 50;
+            
+            for (let i = 0; i < iterations; i++) {
+                const neighbors = [];
                 const r = Math.floor(emptyIdx / size);
                 const c = emptyIdx % size;
-                const possibleIndices = [];
-                if (r > 0) possibleIndices.push(emptyIdx - size);
-                if (r < size - 1) possibleIndices.push(emptyIdx + size);
-                if (c > 0) possibleIndices.push(emptyIdx - 1);
-                if (c < size - 1) possibleIndices.push(emptyIdx + 1);
-                const randomNeighbor = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
-                [tiles[emptyIdx], tiles[randomNeighbor]] = [tiles[randomNeighbor], tiles[emptyIdx]];
-                emptyIdx = randomNeighbor;
+
+                if (r > 0) neighbors.push(emptyIdx - size);
+                if (r < size - 1) neighbors.push(emptyIdx + size);
+                if (c > 0) neighbors.push(emptyIdx - 1);
+                if (c < size - 1) neighbors.push(emptyIdx + 1);
+
+                const nextIdx = neighbors[Math.floor(Math.random() * neighbors.length)];
+                [tiles[emptyIdx], tiles[nextIdx]] = [tiles[nextIdx], tiles[emptyIdx]];
+                emptyIdx = nextIdx;
             }
         }
 
-        function renderGrid() {
+        function render() {
             gridElement.innerHTML = '';
-            tiles.forEach((val, idx) => {
-                const tile = document.createElement('div');
-                tile.className = `tile ${val === 0 ? 'empty' : ''}`;
-                if (val !== 0) {
-                    tile.innerText = val;
-                    if (val === idx + 1) tile.classList.add('correct');
-                    tile.onclick = () => moveTile(idx);
+            tiles.forEach((num, idx) => {
+                const div = document.createElement('div');
+                div.className = `tile ${num === 0 ? 'empty' : ''}`;
+                if (num !== 0) {
+                    div.innerText = num;
+                    if (num === idx + 1) div.classList.add('correct');
+                    div.onclick = () => handleMove(idx);
                 }
-                gridElement.appendChild(tile);
+                gridElement.appendChild(div);
             });
         }
 
-        function moveTile(idx) {
-            if (!isGameActive) return;
+        function handleMove(idx) {
+            if (!isStarted) return;
             const emptyIdx = tiles.indexOf(0);
             const r = Math.floor(idx / size);
             const c = idx % size;
             const er = Math.floor(emptyIdx / size);
             const ec = emptyIdx % size;
-            
+
             if (Math.abs(r - er) + Math.abs(c - ec) === 1) {
                 [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
                 moves++;
                 moveDisplay.innerText = moves;
-                renderGrid();
+                render();
                 checkWin();
             }
         }
 
         function checkWin() {
-            const isWin = tiles.slice(0, -1).every((val, i) => val === i + 1);
-            if (isWin) {
-                isGameActive = false;
+            const win = tiles.slice(0, -1).every((n, i) => n === i + 1);
+            if (win) {
+                isStarted = false;
                 clearInterval(timerInterval);
-                resultText.innerText = `${moves} 手 | ${timerDisplay.innerText}`;
-                modal.classList.remove('hidden');
+                document.getElementById('resultText').innerText = `Level ${currentLevel} : ${moves} Moves in ${timerDisplay.innerText}`;
+                modal.style.display = 'flex';
             }
         }
 
         function startTimer() {
             timerInterval = setInterval(() => {
-                timer++;
-                const m = Math.floor(timer / 60).toString().padStart(2, '0');
-                const s = (timer % 60).toString().padStart(2, '0');
+                time++;
+                const m = Math.floor(time / 60).toString().padStart(2, '0');
+                const s = (time % 60).toString().padStart(2, '0');
                 timerDisplay.innerText = `${m}:${s}`;
             }, 1000);
         }
 
-        resetBtn.onclick = () => { level = 1; initGame(); };
-        difficultySelect.onchange = () => { level = 1; initGame(); };
-        nextLevelBtn.onclick = () => {
-            level++;
-            modal.classList.add('hidden');
+        resetBtn.onclick = () => { currentLevel = 1; initGame(); };
+        diffSelect.onchange = () => { currentLevel = 1; initGame(); };
+        nextBtn.onclick = () => {
+            currentLevel++;
             initGame();
         };
 
-        // Keyboard support
-        window.onkeydown = (e) => {
-            if (!isGameActive) return;
+        // Keyboard Support
+        window.addEventListener('keydown', (e) => {
+            if (!isStarted) return;
             const emptyIdx = tiles.indexOf(0);
-            const r = Math.floor(emptyIdx / size);
-            const c = emptyIdx % size;
             let targetIdx = -1;
-            if (e.key === "ArrowUp" && r < size - 1) targetIdx = emptyIdx + size;
-            if (e.key === "ArrowDown" && r > 0) targetIdx = emptyIdx - size;
-            if (e.key === "ArrowLeft" && c < size - 1) targetIdx = emptyIdx + 1;
-            if (e.key === "ArrowRight" && c > 0) targetIdx = emptyIdx - 1;
-            if (targetIdx !== -1) moveTile(targetIdx);
-        };
+            if (e.key === "ArrowUp" && Math.floor(emptyIdx / size) < size - 1) targetIdx = emptyIdx + size;
+            if (e.key === "ArrowDown" && Math.floor(emptyIdx / size) > 0) targetIdx = emptyIdx - size;
+            if (e.key === "ArrowLeft" && (emptyIdx % size) < size - 1) targetIdx = emptyIdx + 1;
+            if (e.key === "ArrowRight" && (emptyIdx % size) > 0) targetIdx = emptyIdx - 1;
+            if (targetIdx !== -1) handleMove(targetIdx);
+        });
     </script>
 </body>
 </html>
